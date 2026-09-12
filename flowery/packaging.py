@@ -16,9 +16,21 @@ from pathlib import Path
 from .errors import FloweryError
 from .htmltext import html_to_text
 
-__all__ = ["EpubBook", "EpubChapter", "write_cbz", "write_epub"]
+__all__ = ["IMAGE_SUFFIXES", "EpubBook", "EpubChapter", "write_cbz", "write_epub"]
 
-_IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif", ".bmp", ".jxl"}
+# Extensions treated as a page image. Shared with the manhua downloader, which
+# probes these when deciding whether a page has already been fetched (a run may
+# have been post-processed from .jpg into .png).
+IMAGE_SUFFIXES: tuple[str, ...] = (
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+    ".avif",
+    ".gif",
+    ".bmp",
+    ".jxl",
+)
 
 _CSS = """\
 body { font-family: serif; line-height: 1.6; margin: 1.2em; }
@@ -32,7 +44,7 @@ hr { border: none; border-top: 1px solid #999; margin: 1.4em 0; }
 def write_cbz(source_dir: Path, dest: Path) -> Path:
     """Archive every image in ``source_dir`` into a CBZ, in filename order."""
     pages = sorted(
-        (p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() in _IMAGE_SUFFIXES),
+        (p for p in source_dir.iterdir() if p.is_file() and p.suffix.lower() in IMAGE_SUFFIXES),
         key=lambda p: p.name,
     )
     if not pages:

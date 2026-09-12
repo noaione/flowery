@@ -12,7 +12,7 @@ from ..config import UserConfig
 from ..download import FileJob, fetch_many, remove_temp, safe_name
 from ..errors import FloweryError
 from ..models import ManhuaSection, Work, WorkType
-from ..packaging import write_cbz
+from ..packaging import IMAGE_SUFFIXES, write_cbz
 from .helpers import (
     abort_on_error,
     console,
@@ -122,6 +122,9 @@ async def manhua(
                     dest=chapter_dir / f"{index:03d}{Path(path).suffix or _IMAGE_FALLBACK}",
                     authenticated=True,
                     label=Path(path).name,
+                    # A page may have been post-processed in place (denoising turns
+                    # a .jpg into a .png), so accept any image suffix as present.
+                    candidates=IMAGE_SUFFIXES,
                 )
                 for index, path in enumerate(section.image_urls, start=1)
             ]

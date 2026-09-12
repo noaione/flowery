@@ -92,17 +92,49 @@ def remove_temp(root: Path) -> None:
         leftover.unlink(missing_ok=True)
 
 
+def _present(path: Path) -> bool:
+    """True when ``path`` is an existing, non-empty file."""
+    try:
+        return path.stat().st_size > 0
+    except OSError:
+        return False
+
+
 @dataclass(slots=True)
 class FileJob:
-    """A single remote object to write to disk."""
+    """A single remote object to write to disk.
+
+    ``candidates`` lists alternative suffixes that also count as "already
+    downloaded". This exists because a download may be post-processed in place —
+    denoising a manhua page rewrites ``001.jpg`` as ``001.png`` — and re-running
+    the downloader should not fetch the original again.
+    """
 
     url: str
     dest: Path
     authenticated: bool = False
     label: str = ""
+    candidates: tuple[str, ...] = ()
 
     def display(self) -> str:
         return self.label or self.dest.name
+
+    def existing(self) -> Path | None:
+        """Return the artefact already on disk for this job, if any.
+
+        ``dest`` itself is preferred; otherwise every candidate suffix sharing
+        the same stem is probed, so a transformed file satisfies the job.
+        """
+        if _present(self.dest):
+            return self.dest
+        current = self.dest.suffix.lower()
+        for suffix in self.candidates:
+            if suffix.lower() == current:
+                continue
+            alternative = self.dest.with_suffix(suffix)
+            if _present(alternative):
+                return alternative
+        return None
 
 
 @dataclass(slots=True)
@@ -128,7 +160,7 @@ class DownloadReport:
 
 async def _fetch_one(client: FloweryClient, job: FileJob) -> int:
     """Stream a single :class:`FileJob` to disk. Returns bytes written."""
-    if job.dest.exists() and job.dest.stat().st_size > 0:
+    if job.existing() is not None:
         return 0
     job.dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = job.dest.with_name(job.dest.name + ".part")
@@ -157,7 +189,7 @@ async def fetch_many(
     report = DownloadReport()
     pending: list[FileJob] = []
     for job in jobs:
-        if skip_existing and job.dest.exists() and job.dest.stat().st_size > 0:
+        if skip_existing and job.existing() is not None:
             report.skipped += 1
         else:
             pending.append(job)
