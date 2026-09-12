@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 __all__ = [
     "AudioEpisode",
@@ -17,6 +17,7 @@ __all__ = [
     "NovelChapter",
     "NovelChapterDetail",
     "NovelChapterPayload",
+    "NullAsZero",
     "SeriesDetail",
     "SignedUrl",
     "UpdateCalendarEntry",
@@ -43,6 +44,18 @@ class _Model(BaseModel):
 Localized = dict[str, str]
 
 
+def _null_as_zero(value: Any) -> Any:
+    """Treat a JSON ``null`` counter as zero.
+
+    Some rows omit ``price`` / ``purchase_count`` entirely rather than sending
+    ``0``. Without this the whole row would fail validation and abort a download.
+    """
+    return 0 if value is None else value
+
+
+NullAsZero = Annotated[int, BeforeValidator(_null_as_zero)]
+
+
 class Work(_Model):
     """An entry of ``get_all_work_basic_data``."""
 
@@ -65,9 +78,9 @@ class _Chapterish(_Model):
     title: str | Localized | None = None
     status: str | None = None
     is_free: bool = False
-    price: int = 0
+    price: NullAsZero = 0
     has_access: bool = True
-    view_count: int = 0
+    view_count: NullAsZero = 0
     created_at: str | None = None
     updated_at: str | None = None
 
@@ -94,13 +107,13 @@ class ManhuaSection(_Chapterish):
     group_id: str | None = None
     group_title: str | None = None
     group_slug: str | None = None
-    group_sort_order: int = 0
-    position_in_group: int = 0
+    group_sort_order: NullAsZero = 0
+    position_in_group: NullAsZero = 0
     manhua_id: str | None = None
     translation_id: str | None = None
     translator_id: str | None = None
     is_mature: bool = False
-    purchase_count: int = 0
+    purchase_count: NullAsZero = 0
     image_urls: list[str] = Field(default_factory=list)
     header_image_url: str | None = None
     header_image_public_path: str | None = None
@@ -125,12 +138,12 @@ class NovelChapter(_Chapterish):
     group_id: str | None = None
     group_title: str | None = None
     group_slug: str | None = None
-    group_sort_order: int = 0
-    position_in_group: int = 0
+    group_sort_order: NullAsZero = 0
+    position_in_group: NullAsZero = 0
     translation_id: str | None = None
-    word_count: int = 0
+    word_count: NullAsZero = 0
     is_mature: bool = False
-    purchase_count: int = 0
+    purchase_count: NullAsZero = 0
 
     @property
     def id(self) -> str:
@@ -147,14 +160,14 @@ class NovelChapterDetail(_Chapterish):
     language: str | None = None
     chapter_kind: str | None = None
     group_id: str | None = None
-    position_in_group: int = 0
+    position_in_group: NullAsZero = 0
     novel_id: str | None = None
     translation_id: str | None = None
     translator_id: str | None = None
     contributor_id: str | None = None
-    word_count: int = 0
+    word_count: NullAsZero = 0
     is_mature: bool = False
-    purchase_count: int = 0
+    purchase_count: NullAsZero = 0
     scheduled_at: str | None = None
 
 
@@ -225,7 +238,7 @@ class SeriesDetail(_Model):
     languages: list[str] = Field(default_factory=list)
     status: str | None = None
     update_status: str | None = None
-    view_count: int = 0
+    view_count: NullAsZero = 0
     is_free: bool = False
     total_episode_count: int | None = None
     video_type: str | None = None
