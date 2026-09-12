@@ -1,0 +1,107 @@
+[project]
+name = "flowery"
+version = "0.1.0"
+description = "when girls meet each others"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "noaione", email = "noaione@n4o.xyz" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8.5.0",
+    "cryptography>=50.0.1",
+    "httpx[http2]>=0.28.1",
+    "pydantic>=2.13.5",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+flowery = "flowery.runner:main"
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[tool.ruff]
+line-length = 120
+extend-exclude = [
+    "env",
+    "venv",
+    ".pytest_cache",
+    ".venv",
+    "__pycache__",
+    ".git",
+    ".mypy_cache",
+    ".vscode",
+    ".ruff_cache",
+    "**/Lib/**",
+    "dist",
+    "build",
+    "_templates",
+    "tools",
+]
+target-version = "py311"
+src = ["flowery", "tests", "ci"]
+
+[tool.ruff.format]
+preview = true
+indent-style = "space"
+quote-style = "double"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "N",
+    "S",
+    "B",
+    "T",
+    "Q",
+    "D",
+    "RUF",
+    "COM",
+    "PTH",
+    "ASYNC"
+]
+ignore = [
+    "whitespace-before-punctuation",
+    "undefined-local-with-import-star-usage",
+    "undefined-local-with-import-star",
+    "forward-annotation-syntax-error",
+    "non-lowercase-variable-in-function",
+    "missing-trailing-comma",
+    "missing-trailing-period",  # first line should be period, most of my docstring will be LICENSE header so no thanks
+    "blank-line-after-function",
+    "non-imperative-mood",
+    "CPY",
+]
+preview = true
+extend-ignore = ["D", "subprocess-without-shell-equals-true", "suspicious-subprocess-import", "print"] # D -> Docstring missing for public function or method
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+ignore-decorators = ["typing.overload"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = false
+split-on-trailing-comma = true
+required-imports = ["from __future__ import annotations"]
+known-first-party = ["tests", "flowery"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["unused-import", "undefined-local-with-import-star", "missing-required-import", "missing-blank-line-after-summary"]
+"tests/*.py" = ["assert", "missing-required-import", "D"]  # assert statement used in pytest
+"pipelines/*" = ["T", "I", "subprocess-without-shell-equals-true", "D"]
+"tools/*.py" = ["undocumented-public-module", "print", "missing-required-import"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.7",
+]
