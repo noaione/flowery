@@ -1,4 +1,4 @@
-"""``flowery manhua`` - download manhua chapters as images and CBZ archives."""
+"""``flowery manhua`` - download manhua chapters as page images."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ _IMAGE_FALLBACK = ".jpg"
     default=None,
     help="Chapters to fetch, e.g. '1-5,8' or 'all'. Defaults to all accessible chapters.",
 )
-@click.option("--cbz/--no-cbz", default=True, show_default=True, help="Also build a CBZ archive.")
+@click.option("--cbz/--no-cbz", default=False, show_default=True, help="Also build a CBZ archive.")
 @click.option("--concurrency", "-j", type=click.IntRange(1, 32), default=8, show_default=True)
 @click.option(
     "--output",

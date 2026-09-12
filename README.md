@@ -65,7 +65,7 @@ flowery audio night-ferry
 | `info` | Show metadata for one work (original title, translator, schedule, ...). |
 | `list` | List the chapters or episodes of a work. |
 | `calendar` | Show the release schedule for a month. |
-| `manhua` | Download manhua chapters as page images, plus CBZ archives. |
+| `manhua` | Download manhua chapters as page images (add `--cbz` for archives). |
 | `novel` | Download novel chapters as Markdown / text / HTML / EPUB. |
 | `video` | Download videos, decrypting the AES-128 HLS stream. |
 | `audio` | Download audio drama / audiobook episodes as MP3. |
@@ -103,7 +103,7 @@ DOWNLOADS/
     ├── work.json                     # work level metadata
     ├── index.json                    # chapter/episode index
     └── 001-chapter-1/                # one directory per chapter/episode
-        ├── 001.jpg …                 # manhua: pages, plus 001-chapter-1.cbz alongside
+        ├── 001.jpg …                 # manhua: pages (001-chapter-1.cbz with --cbz)
         ├── chapter.md / chapter.txt  # novel
         ├── <slug>.mp4                # video
         ├── <slug>.mp3                # audio
