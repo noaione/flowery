@@ -426,20 +426,19 @@ async def download_hls(
     console.print(f"[dim]decrypted {human_size(decrypted)} across {len(playlist.segments)} segments[/]")
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    merged = dest.with_suffix(".ts") if remux else dest
-    with merged.open("wb") as out:
+    # `dest` names the requested container (.mp4); the concatenated MPEG-TS stream
+    # is an intermediate that becomes the final artefact when not remuxing.
+    stream = dest.with_suffix(".ts")
+    with stream.open("wb") as out:
         for index in range(len(playlist.segments)):
             out.write((scratch / f"{index:05d}.ts").read_bytes())
 
-    if not keep_segments and not remux:
+    if not keep_segments:
         shutil.rmtree(scratch, ignore_errors=True)
 
-    if remux:
-        final = _remux(merged, dest, console)
-        if not keep_segments:
-            shutil.rmtree(scratch, ignore_errors=True)
-        return final
-    return merged
+    if not remux:
+        return stream
+    return _remux(stream, dest, console)
 
 
 def _remux(source: Path, dest: Path, console: Console) -> Path:
