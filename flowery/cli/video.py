@@ -104,6 +104,7 @@ async def video(
                 "slug": work.slug,
                 "id": work.id,
                 "type": work.work_type.value,
+                "created_at": work.created_at,
                 "author": (series.authors or {}).get("display_name"),
                 "languages": series.languages,
                 "total_episodes": series.total_episode_count,
@@ -127,7 +128,10 @@ async def video(
                 continue
 
             episode_dir = unit_dir(root, number, detail.slug)
-            target = episode_dir / f"{safe_name(detail.slug)}.mp4"
+            # Without remuxing the final artefact is a raw MPEG-TS stream, so the
+            # existing-file check has to look for that extension instead.
+            suffix = ".mp4" if remux else ".ts"
+            target = episode_dir / f"{safe_name(detail.slug)}{suffix}"
             if force or not target.exists():
                 try:
                     produced = await download_hls(

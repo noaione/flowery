@@ -105,6 +105,7 @@ async def novel(
                 "slug": work.slug,
                 "id": work.id,
                 "type": work.work_type.value,
+                "created_at": work.created_at,
                 "original_title": (meta.get("novels") or {}).get("title"),
                 "translator": (meta.get("translators") or {}).get("display_name"),
                 "total_chapters": meta.get("total_chapters"),
@@ -186,6 +187,7 @@ def _write_index(root: Path, work: Work, chapters: list[NovelChapter], chosen: l
     index = {
         "slug": work.slug,
         "title": work.title,
+        "created_at": work.created_at,
         "chapters": [
             {
                 "number": chapter.chapter_number,
@@ -194,6 +196,7 @@ def _write_index(root: Path, work: Work, chapters: list[NovelChapter], chosen: l
                 "words": chapter.word_count,
                 "accessible": chapter.has_access,
                 "selected": chapter.chapter_number in chosen,
+                "created_at": chapter.created_at,
             }
             for chapter in chapters
         ],

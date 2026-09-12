@@ -86,6 +86,7 @@ async def audio(
                 "slug": work.slug,
                 "id": work.id,
                 "type": work.work_type.value,
+                "created_at": work.created_at,
                 "author": (series.authors or {}).get("display_name"),
                 "languages": series.languages,
                 "total_episodes": series.total_episode_count,

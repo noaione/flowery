@@ -91,6 +91,7 @@ async def manhua(
                 "slug": work.slug,
                 "id": work.id,
                 "type": work.work_type.value,
+                "created_at": work.created_at,
                 "original_title": (meta.get("manhuas") or {}).get("title"),
                 "translator": (meta.get("translators") or {}).get("display_name"),
                 "total_chapters": meta.get("total_sections"),
@@ -157,6 +158,7 @@ def _write_index(root: Path, work: Work, sections: list[ManhuaSection]) -> None:
     index = {
         "slug": work.slug,
         "title": work.title,
+        "created_at": work.created_at,
         "chapters": [
             {
                 "number": section.section_number,
@@ -164,6 +166,7 @@ def _write_index(root: Path, work: Work, sections: list[ManhuaSection]) -> None:
                 "title": section.label(),
                 "pages": len(section.image_urls),
                 "accessible": section.has_access,
+                "created_at": section.created_at,
             }
             for section in sections
         ],
