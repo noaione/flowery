@@ -169,7 +169,7 @@ def _write_index(root: Path, work: Work, sections: list[ManhuaSection]) -> None:
                 "title": section.label(),
                 "pages": len(section.image_urls),
                 "accessible": section.has_access,
-                "created_at": section.created_at,
+                "created_at": section.updated_at,
             }
             for section in sections
         ],

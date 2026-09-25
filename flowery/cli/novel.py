@@ -196,7 +196,7 @@ def _write_index(root: Path, work: Work, chapters: list[NovelChapter], chosen: l
                 "words": chapter.word_count,
                 "accessible": chapter.has_access,
                 "selected": chapter.chapter_number in chosen,
-                "created_at": chapter.created_at,
+                "created_at": chapter.updated_at,
             }
             for chapter in chapters
         ],
